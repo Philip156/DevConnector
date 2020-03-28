@@ -78,4 +78,42 @@ router.post('/',
         }
 })
 
+//Get all profiles
+router.get('/all', async (req, res) => {
+    try {
+        const profiles = await Profile.find().populate('user', ['name', 'avatar'])
+
+        if (!profiles) {
+            return res.status(400).json({ msg: 'No profiles found' })
+        }
+
+        res.json(profiles)
+
+    } catch (e) {
+        console.error(e.message)
+        res.status(500).send('Server error')
+    }
+})
+
+//Get all profiles
+router.get('/user/:user_id', async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.params.user_id }).populate('user', ['name', 'avatar'])
+
+        if (!profile) {
+            return res.status(400).json({ msg: 'No profile found' })
+        }
+
+        res.json(profile)
+        
+    } catch (e) {
+        console.error(e.message)
+
+        if (e.kind == 'ObjectId') {
+            return res.status(400).json({ msg: 'No profile found' })
+        }
+        res.status(500).send('Server error')
+    }
+})
+
 module.exports = router
